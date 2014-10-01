@@ -7235,6 +7235,7 @@ function agendaListView(element, calendar) {
                     disDate         = (formatDate(displayeventlist[i].displayDay, opt('columnFormat')));
                     ltitle          = htmlEscape(displayeventlist[i].title);
                     zipcode         = htmlEscape(displayeventlist[i].zipcode);
+                    status          = htmlEscape(displayeventlist[i].status);
                     allDay          = displayeventlist[i].allDay;
                     startDate       = htmlEscape(formatDate(displayeventlist[i].start, opt('timeFormat')));
                     if ( displayeventlist[i].end ) {
@@ -7249,13 +7250,28 @@ function agendaListView(element, calendar) {
                         classes = classes.concat(displayeventlist[i].source.className);
                     }
                     
-                    console.log(classes);
                     if (zipcode != temp) {
                         $("<li class='fc-agendaList-dayHeader ui-widget-header'>" +
                             "<span class='fc-agendaList-day'>"+ zipcode +"</span>" +
                         "</li>").appendTo(html);
                         temp = zipcode;
                     }
+
+                    // Get html for different event status
+                    switch(status) {
+                      case "Open":
+                        var statusText = $('<span style="color:rgb(39, 174, 96);float:right;font-weight:bold">Open</span>');
+                        break;
+                      case "Past":
+                        var statusText = $('<span style="color:rgb(230, 126, 34);float:right;font-weight:bold">Past</span>');
+                        break;
+                      case "Confirmed":
+                        var statusText = $('<span style="color:rgb(230, 126, 34);float:right;font-weight:bold">Closed</span>');
+                        break;
+                      default:
+                        var statusText = $("<span></span");
+                    }
+
                     if (allDay) {
                     // if the event is all day , make sure you print that and not date and time
                     // otherwise do the opposite
@@ -7286,6 +7302,7 @@ function agendaListView(element, calendar) {
                                               ( description ? "<div class='fc-eventlist-desc'>"+ htmlEscape(description) +"</div>" : "")+
                                             "</div>"+
                                             "<div class='fc-agendaList-date pull-right'>"+ disDate +
+                                            "<br>" + statusText.prop('outerHTML') +
                                             "</div>" +
                                           "</" + (lurl ? "a" : "div") + ">"+
                                         "</li>").appendTo(html);
