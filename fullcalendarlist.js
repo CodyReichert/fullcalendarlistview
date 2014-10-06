@@ -7110,7 +7110,7 @@ function agendaListView(element, calendar) {
     }
     
   function render(date, delta) {
-        t.intervalStart = date.clone().stripTime().startOf('month');
+    t.intervalStart = date.clone().stripTime().startOf('month');
     t.intervalEnd = t.intervalStart.clone().add('months', 1);
 
     t.start = t.intervalStart.clone();
@@ -7313,7 +7313,253 @@ function agendaListView(element, calendar) {
         $(element).html(html);
             trigger('eventAfterAllRender');
         }
-        
+
+        function clearEvents() {
+    }
+  }
+
+
+/***************** List View by Price *********************/
+
+//add new view and its button
+fcViews.agendaListByPrice = agendaListByPrice;
+defaults.defaultButtonText.agendaListByPrice = 'list by price';
+defaults.titleFormat.agendaListByPrice = 'MMMM YYYY';
+defaults.columnFormat.agendaListByPrice= 'MMMM D, YYYY';
+
+
+defaults.agendaDisType   = true;
+
+function agendaListByPrice(element, calendar) {
+  var t = this;
+
+
+  // exports
+  t.incrementDate = incrementDate;
+  t.render = render;
+
+  // imports
+  ListViewByPrice.call(t, element, calendar );
+  var opt = t.opt;
+  //var renderAgendaList = t.renderAgendaList;
+  var formatDate = calendar.formatDate;
+
+  function incrementDate(date, delta) {
+          return date.clone().stripTime().add('months', delta).startOf('month');
+  }
+
+  function render(date, delta) {
+    t.intervalStart = date.clone().stripTime().startOf('month');
+    t.intervalEnd = t.intervalStart.clone().add('months', 1);
+
+    t.start = t.intervalStart.clone();
+    t.end = t.intervalEnd.clone();
+    t.title = calendar.formatDate(t.intervalStart, t.opt('titleFormat'));
+  }
+}
+
+    function ListViewByPrice(element, calendar) {
+        var t = this;
+
+
+        // exports
+        //t.renderAgendaList = renderAgendaList;
+        t.setHeight = setHeight;
+        t.setWidth = setWidth;
+        t.renderEvents = renderEvents;
+        t.clearEvents = clearEvents;
+
+        t.cellIsAllDay = function () {
+            return true
+        };
+
+        t.getColWidth = function () {
+            return colWidth
+        };
+        t.getDaySegmentContainer = function () {
+            return daySegmentContainer
+        };
+
+
+        // imports
+        View.call(t, element, calendar, 'agendaListByPrice' );
+        OverlayManager.call(t);
+        SelectionManager.call(t);
+
+        var opt = t.opt;
+        var trigger = t.trigger;
+
+        var formatDate = calendar.formatDate;
+
+        // locals
+        var updateEvents = t.calendar.updateEvents;
+        var body;
+
+
+        var viewWidth;
+        var viewHeight;
+        var colWidth;
+
+        var firstDay;
+
+
+        var eventElementHandlers = t.eventElementHandlers;
+
+        // in other views, buildTable function was used but I m using a list here which I will append at the div
+
+
+    function setHeight(height) {
+    viewHeight = height;
+    var bodyHeight = viewHeight;
+    }
+
+    function setWidth(width) {
+      viewWidth = width;
+    }
+
+    var reportEventClear = t.reportEventClear;
+    var getDaySegmentContainer = t.getDaySegmentContainer;
+
+
+    function renderEvents(events, modifiedEventId) {
+            // Duplicate the list of events and use the duplicate to format and print ordered list of events
+            // We need to duplicate so that we can have multiple-days event split into number of each day event for the diplaying purpose
+            // Event start Monday to Friday, we will have to display the same event everyday, hence adding that on Tuesday, Wednesday and Thursday
+
+            var displayeventlist = [];
+            var tstart, tend;
+            var j = 0;
+            for(i in events) {
+                displayeventlist[j] = Object.create(events[i]);
+                tstart = events[i].start.clone();
+                tend   = events[i].end ? events[i].end.clone() : null;
+                /* for multiple-days event, We need to know each and every day this particular event should be displayed for
+                   an event that start from 12 - 15 / we have to display this event also on 13 and 14
+                   hence a new list of objects to hold these displaying dates
+                */
+                displayeventlist[j].listingPrice = events[i].listingPrice;
+                displayeventlist[j].displayDay = events[i].start ;
+                console.log(events[i]);
+                while( (tend - tstart) > 1000*60*60*24 ) {
+                    j = j + 1;
+                    displayeventlist[j] = Object.create(events[i]);
+                    tstart = tstart.add(1, 'day');
+                    displayeventlist[j].listingPrice = tstart.clone();
+                }
+                j = j + 1;
+            }
+
+      // We would like to display these events from 1 - 31 of each month, sort them now
+      displayeventlist.sort(function(a,b) {
+                           var priceA = a.listingPrice;
+                           var priceB = b.listingPrice;
+                           var stripPriceA = Number(priceA.replace(/[^0-9\.]+/g, ""));
+                           var stripPriceB = Number(priceB.replace(/[^0-9\.]+/g, ""));
+                           return stripPriceA-stripPriceB;
+                           });
+
+      //Start displaying our sorted list
+      var html    = $("<ul class='fc-agendaList'></ul>");
+      var disDay, disDate, lurl, ltitle, evMonth, visMonth, visYear;
+      var disDay, disDate, ltitle, allDay, startDate, endDate;
+      var temp, i = 0, count = 0;
+
+            visMonth = formatDate(t.intervalStart, 'MM');     // current view month
+            visYear  = formatDate(t.intervalStart, 'YYYY');   // current view year
+
+            for (i in displayeventlist) {
+                // display current month events only ** this might change later if we decide to scroll up down
+                // make sure to check current view month and year
+                evMonth = formatDate(displayeventlist[i].start, 'MM');
+                evYear  = formatDate(displayeventlist[i].start, 'YYYY');
+                if ( evMonth == visMonth && evYear == visYear) {
+                    count++;
+                    disDay          = (formatDate(displayeventlist[i].displayDay, 'dddd'));
+                    disDate         = (formatDate(displayeventlist[i].displayDay, opt('columnFormat')));
+                    ltitle          = htmlEscape(displayeventlist[i].title);
+                    zipcode         = htmlEscape(displayeventlist[i].zipcode);
+                    listingPrice    = htmlEscape(displayeventlist[i].listingPrice);
+                    status          = htmlEscape(displayeventlist[i].status);
+                    allDay          = displayeventlist[i].allDay;
+                    startDate       = htmlEscape(formatDate(displayeventlist[i].start, opt('timeFormat')));
+                    if ( displayeventlist[i].end ) {
+                        endDate         = htmlEscape(formatDate(displayeventlist[i].end, opt('timeFormat')));
+                    }
+                    lurl        = displayeventlist[i].url;
+                    classes     = displayeventlist[i].className;
+                    description = displayeventlist[i].description;
+
+                    // if the events are from source, then pick the className from the source not from event object itself
+                    if (displayeventlist[i].source) {
+                        classes = classes.concat(displayeventlist[i].source.className);
+                    }
+
+                    //if (zipcode != temp) {
+                    //    $("<li class='fc-agendaList-dayHeader ui-widget-header'>" +
+                    //        "<span class='fc-agendaList-day'>"+ zipcode +"</span>" +
+                    //    "</li>").appendTo(html);
+                    //    temp = zipcode;
+                    //}
+
+                    // Get html for different event status
+                    switch(status) {
+                      case "Open":
+                        var statusText = $('<span style="color:rgb(39, 174, 96);float:right;font-weight:bold">Open</span>');
+                        break;
+                      case "Past":
+                        var statusText = $('<span style="color:rgb(230, 126, 34);float:right;font-weight:bold">Past</span>');
+                        break;
+                      case "Confirmed":
+                        var statusText = $('<span style="color:rgb(230, 126, 34);float:right;font-weight:bold">Closed</span>');
+                        break;
+                      default:
+                        var statusText = $("<span></span");
+                    }
+
+                    if (allDay) {
+                    // if the event is all day , make sure you print that and not date and time
+                    // otherwise do the opposite
+                        eventdisplay = $("<li class='fc-agendaList-item'>"+
+                                            "<"+ (lurl ? "a href='"+ htmlEscape(lurl) +"'" : "div") +
+                                            " class='fc-agendaList-event fc-eventlist "+ classes +"'>"+
+                                            "<div class='fc-event-time'>"+
+                                                "<span class='fc-event-all-day'>"+ opt('allDayText') +"</span>"+
+                                            "</div>"+
+                                            "<div class='fc-agendaList-eventDetails'>"+
+                                              "<div class='fc-eventlist-price'>"+ listingPrice +"</div>"+
+                                              "<div class='fc-eventlist-title'>"+ ltitle+"</div>"+
+                                              ( description ? "<div class='fc-eventlist-desc'>"+ htmlEscape(description) +"</div>" : "")+
+                                            "</div>"+
+                                            "<div class='fc-agendaList-date pull-right'>"+ disDate +
+                                            "</div>" +
+                                          "</" + (lurl ? "a" : "div") + ">"+
+                                        "</li>").appendTo(html);
+                    } else {
+                        eventdisplay = $("<li class='fc-agendaList-item'>"+
+                                        "<"+ (lurl ? "a href='"+ htmlEscape(lurl) +"'" : "div") +
+                                        " class='fc-agendaList-event fc-eventlist "+ classes.join(' ') +"'>"+
+                                            "<div class='fc-event-time'>"+
+                                                "<span class='fc-event-start-time'>"+ startDate +"</span> "+
+                                                "<span class='fc-event-end-time'>"+ ( endDate ? endDate : "") +"</span>"+
+                                            "</div>"+
+                                            "<div class='fc-agendaList-eventDetails'>"+
+                                              "<div class='fc-eventlist-price'>"+ listingPrice +"</div>"+
+                                              "<div class='fc-eventlist-title'>"+ ltitle +"</div>"+
+                                              (description ? "<div class='fc-eventlist-desc'>"+ htmlEscape(description) +"</div>" : "")+
+                                            "</div>"+
+                                            "<div class='fc-agendaList-date pull-right'>"+ disDate +
+                                            "<br>" + statusText.prop('outerHTML') +
+                                            "</div>" +
+                                          "</" + (lurl ? "a" : "div") + ">"+
+                                        "</li>").appendTo(html);
+                    }
+                    eventElementHandlers(displayeventlist[i], eventdisplay);
+                }
+      }
+        $(element).html(html);
+            trigger('eventAfterAllRender');
+        }
+
         function clearEvents() {
     }
     }
