@@ -7538,16 +7538,16 @@ function agendaListByPrice(element, calendar) {
                                         "<"+ (lurl ? "a href='"+ htmlEscape(lurl) +"'" : "div") +
                                         " class='fc-agendaList-event fc-eventlist "+ classes.join(' ') +"'>"+
                                             "<div class='fc-event-time'>"+
-                                                "<span class='fc-event-start-time'><strong>" + listingPrice +
-                                                "</strong></span>" +
+                                              "<span class='fc-event-start-time'><strong>" + listingPrice +
+                                              "</strong></span>" +
                                             "</div>"+
                                             "<div class='fc-agendaList-eventDetails'>"+
-                                              "<div class='fc-eventlist-price'>"+ listingPrice +"</div>"+
+                                              "<div class='fc-eventlist-price'></div>"+
                                               "<div class='fc-eventlist-title'>"+ ltitle +"</div>"+
                                               (description ? "<div class='fc-eventlist-desc'>"+ htmlEscape(description) +"</div>" : "")+
                                             "</div>"+
                                             "<div class='fc-agendaList-date pull-right'>"+ disDate +
-                                            "<br>" + statusText.prop('outerHTML') +
+                                              "<br>" + statusText.prop('outerHTML') +
                                             "</div>" +
                                           "</" + (lurl ? "a" : "div") + ">"+
                                         "</li>").appendTo(html);
