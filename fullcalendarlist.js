@@ -1103,8 +1103,8 @@ function Header(calendar, options) {
       element = $("<table class='fc-header' style='width:100%'/>")
         .append(
           $("<tr/>")
-            .append(renderSection('left'))
             .append(renderSection('center'))
+            .append(renderSection('left'))
             .append(renderSection('right'))
         );
       return element;
