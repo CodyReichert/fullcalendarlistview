@@ -7272,7 +7272,7 @@ function agendaListView(element, calendar) {
                         var statusText = $("<span></span");
                     }
 
-                    if (allDay) {
+                    if (allDay && status !== "Past") {
                     // if the event is all day , make sure you print that and not date and time
                     // otherwise do the opposite
                         eventdisplay = $("<li class='fc-agendaList-item'>"+
@@ -7289,7 +7289,7 @@ function agendaListView(element, calendar) {
                                             "</div>" +
                                           "</" + (lurl ? "a" : "div") + ">"+
                                         "</li>").appendTo(html);
-                    } else {
+                    } else if ( status !== "Past") {
                         eventdisplay = $("<li class='fc-agendaList-item'>"+
                                         "<"+ (lurl ? "a href='"+ htmlEscape(lurl) +"'" : "div") + 
                                         " class='fc-agendaList-event fc-eventlist "+ classes.join(' ') +"'>"+
@@ -7439,7 +7439,6 @@ function agendaListByPrice(element, calendar) {
                 */
                 displayeventlist[j].listingPrice = events[i].listingPrice;
                 displayeventlist[j].displayDay = events[i].start ;
-                console.log(events[i]);
                 while( (tend - tstart) > 1000*60*60*24 ) {
                     j = j + 1;
                     displayeventlist[j] = Object.create(events[i]);
@@ -7456,7 +7455,7 @@ function agendaListByPrice(element, calendar) {
                            var stripPriceA = Number(priceA.replace(/[^0-9\.]+/g, ""));
                            var stripPriceB = Number(priceB.replace(/[^0-9\.]+/g, ""));
                            return stripPriceA-stripPriceB;
-                           });
+      });
 
       //Start displaying our sorted list
       var html    = $("<ul class='fc-agendaList'></ul>");
@@ -7516,7 +7515,7 @@ function agendaListByPrice(element, calendar) {
                         var statusText = $("<span></span");
                     }
 
-                    if (allDay) {
+                    if (allDay && status !== "Past") {
                     // if the event is all day , make sure you print that and not date and time
                     // otherwise do the opposite
                         eventdisplay = $("<li class='fc-agendaList-item'>"+
@@ -7534,13 +7533,13 @@ function agendaListByPrice(element, calendar) {
                                             "</div>" +
                                           "</" + (lurl ? "a" : "div") + ">"+
                                         "</li>").appendTo(html);
-                    } else {
+                    } else if ( status !== "Past") {
                         eventdisplay = $("<li class='fc-agendaList-item'>"+
                                         "<"+ (lurl ? "a href='"+ htmlEscape(lurl) +"'" : "div") +
                                         " class='fc-agendaList-event fc-eventlist "+ classes.join(' ') +"'>"+
                                             "<div class='fc-event-time'>"+
-                                                "<span class='fc-event-start-time'>"+ startDate +"</span> "+
-                                                "<span class='fc-event-end-time'>"+ ( endDate ? endDate : "") +"</span>"+
+                                                "<span class='fc-event-start-time'><strong>" + listingPrice +
+                                                "</strong></span>" +
                                             "</div>"+
                                             "<div class='fc-agendaList-eventDetails'>"+
                                               "<div class='fc-eventlist-price'>"+ listingPrice +"</div>"+
