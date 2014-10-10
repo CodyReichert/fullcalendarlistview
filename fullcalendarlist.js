@@ -7306,7 +7306,7 @@ function agendaListView(element, calendar) {
                                             "</div>" +
                                           "</" + (lurl ? "a" : "div") + ">"+
                                         "</li>").appendTo(html);
-                    }
+                    } else { eventdisplay = $('<div></div>'); }
                     eventElementHandlers(displayeventlist[i], eventdisplay);
                 }
       }
@@ -7551,7 +7551,7 @@ function agendaListByPrice(element, calendar) {
                                             "</div>" +
                                           "</" + (lurl ? "a" : "div") + ">"+
                                         "</li>").appendTo(html);
-                    }
+                    } else { eventdisplay = $('<div></div>'); }
                     eventElementHandlers(displayeventlist[i], eventdisplay);
                 }
       }
