@@ -7250,7 +7250,7 @@ function agendaListView(element, calendar) {
                         classes = classes.concat(displayeventlist[i].source.className);
                     }
                     
-                    if (zipcode != temp) {
+                    if (zipcode != temp && status !== "Past") {
                         $("<li class='fc-agendaList-dayHeader ui-widget-header'>" +
                             "<span class='fc-agendaList-day'>"+ zipcode +"</span>" +
                         "</li>").appendTo(html);
