@@ -7450,8 +7450,8 @@ function agendaListByPrice(element, calendar) {
 
       // We would like to display these events from 1 - 31 of each month, sort them now
       displayeventlist.sort(function(a,b) {
-                           var priceA = a.listingPrice;
-                           var priceB = b.listingPrice;
+                           var priceA = String(a.listingPrice);
+                           var priceB = String(b.listingPrice);
                            var stripPriceA = Number(priceA.replace(/[^0-9\.]+/g, ""));
                            var stripPriceB = Number(priceB.replace(/[^0-9\.]+/g, ""));
                            return stripPriceA-stripPriceB;
